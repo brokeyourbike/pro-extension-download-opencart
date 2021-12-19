@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>pro_extension_download</name>
+    <code>pro_extension_download</code>
+    <description>PRO Extension Download</description>
+    <version>1.0.0</version>
+    <author><![CDATA[Ivan Stasiuk<br/><a href="https://stasi.uk">Get Help</a>]]></author>
+    <link>https://stasi.uk</link>
+
+    <file path="admin/view/template/marketplace/installer_history.twig">
+        <operation error="skip">
+            <search><![CDATA[<th>{{ column_date_added }}</th>]]></search>
+            <add position="after"><![CDATA[
+                <!-- PRO_EXTENSION_DOWNLOAD START -->
+                <th>Download</th>
+                <!-- PRO_EXTENSION_DOWNLOAD END -->
+            ]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[<td>{{ history.date_added }}</td>]]></search>
+            <add position="after"><![CDATA[
+                <!-- PRO_EXTENSION_DOWNLOAD START -->
+                <td><button type="button" value="{{ history.extension_install_id }}" data-loading="{{ text_loading }}" data-toggle="tooltip" title="Download" class="btn btn-success pro-extension-download-button"><i class="fa fa-download"></i></button></td>
+                <!-- PRO_EXTENSION_DOWNLOAD END -->
+            ]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[<td colspan="3" class="text-center">{{ text_no_results }}</td>]]></search>
+            <add position="replace"><![CDATA[
+                <!-- PRO_EXTENSION_DOWNLOAD START -->
+                <td colspan="4" class="text-center">{{ text_no_results }}</td>
+                <!-- PRO_EXTENSION_DOWNLOAD END -->
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/view/template/marketplace/installer.twig">
+        <operation error="skip">
+            <search><![CDATA[{{ footer }}]]></search>
+            <add position="before"><![CDATA[
+                <!-- PRO_EXTENSION_DOWNLOAD START -->
+                <script type="text/javascript">
+                $(function() {
+                    $('#history').on('click', '.pro-extension-download-button', function(e) {
+                        e.preventDefault();
+
+                        var element = this;
+
+                        $.ajax({
+                            url: 'index.php?route=extension/module/pro_extension_download/download_extension&user_token={{ user_token }}&extension_id=' + $(this).attr('value'),
+                            dataType: 'json',
+                            beforeSend: function() {
+                                $(element).button('loading');
+                            },
+                            complete: function() {
+                                $(element).button('reset');
+                            },
+                            success: function(json) {
+                                if (json['filename']) { location.href = json['filename']; }
+                            },
+                            error: function(xhr, ajaxOptions, thrownError) {
+                                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                            }
+                        });
+                    });
+                });
+                </script>
+                <!-- PRO_EXTENSION_DOWNLOAD END -->
+            ]]></add>
+        </operation>
+    </file>
+
+</modification>
